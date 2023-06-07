@@ -15,23 +15,27 @@ class Genre(ModelSQL, ModelView):
     'Genre'
     __name__ = 'library.genre'
 
+    name = fields.Char('Name', required=True)
+
 
 class Editor(ModelSQL, ModelView):
     'Editor'
     __name__ = 'library.editor'
 
-    genres = fields.Many2Many('library.editor-library.genre', 'editor',
-        'genre', 'Genres')
+    genres = fields.Many2Many('library.editor-library.genre', 'editor','genre', 'Genres')
+
+    name = fields.Char('name', required=True, help='Name of the editor')
+
+    creation_date = fields.Date('start of the publisher\'s activity',required=True,help='Date of the editor\'s activity')
 
 
 class EditorGenreRelation(ModelSQL):
     'Editor - Genre relation'
     __name__ = 'library.editor-library.genre'
 
-    editor = fields.Many2One('library.editor', 'Editor', required=True,
-        ondelete='CASCADE')
-    genre = fields.Many2One('library.genre', 'Genre', required=True,
-        ondelete='RESTRICT')
+    editor = fields.Many2One('library.editor', 'Editor', required=True,ondelete='CASCADE')
+    
+    genre = fields.Many2One('library.genre', 'Genre', required=True,ondelete='RESTRICT')
 
 
 class Author(ModelSQL, ModelView):
@@ -40,24 +44,48 @@ class Author(ModelSQL, ModelView):
 
     books = fields.One2Many('library.book', 'author', 'Books')
 
+    name = fields.Char('name', required=True)
 
+    gender = fields.Selection([('man', 'Man'), ('woman', 'Woman')], 'Gender')
+
+    written_books_number = fields.Integer('number of books written')
+
+    birth_date = fields.Date('Date of birth',required=True,help='Date of birth of the author')
+    
+    death_date = fields.Date('Date of death',required=True,help='Date of death of the author')
+
+   
 class Book(ModelSQL, ModelView):
     'Book'
     __name__ = 'library.book'
 
-    author = fields.Many2One('library.author', 'Author', required=True,
-        ondelete='CASCADE')
-    exemplaries = fields.One2Many('library.book.exemplary', 'book',
-        'Exemplaries')
-    genre = fields.Many2One('library.genre', 'Genre', ondelete='RESTRICT',
-        required=False)
-    editor = fields.Many2One('library.editor', 'Editor', ondelete='RESTRICT',
-        required=True)
+    author = fields.Many2One('library.author', 'Author', required=True,ondelete='CASCADE')
+
+    exemplaries = fields.One2Many('library.book.exemplary', 'book','Exemplaries')
+
+    genre = fields.Many2One('library.genre', 'Genre', ondelete='RESTRICT',required=False)
+
+    editor = fields.Many2One('library.editor', 'Editor', ondelete='RESTRICT',required=True)
+
+    summary = fields.Text('Summary')
+
+    page_count = fields.Integer('Page Count',help='The number of page in the book')
+
+    edition_stopped = fields.Boolean('Edition stopped',help='If True, this book will not be printed again in this version')
+
+    title = fields.Char('Title',required=True,help='The title of the book')
+
+    description = fields.Char('Description',required=True,help='Description of the book')
 
 
 class Exemplary(ModelSQL, ModelView):
     'Exemplary'
     __name__ = 'library.book.exemplary'
 
-    book = fields.Many2One('library.book', 'Book', ondelete='CASCADE',
-        required=True)
+    book = fields.Many2One('library.book', 'Book', ondelete='CASCADE',required=True)
+
+    acquisition_price = fields.Numeric('Acquisition Price', digits=(16, 2))
+
+    acquisition_date = fields.Date('Acquisition Date')
+    
+    id = fields.Char('ID', readonly=True, help='Boook identifier')
