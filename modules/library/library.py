@@ -149,10 +149,9 @@ class Book(ModelSQL, ModelView):
     __name__ = 'library.book'
     _rec_name = 'title'
 
-    author = fields.Many2One('library.author', 'Author', required=True,
-        ondelete='CASCADE')
-    exemplaries = fields.One2Many('library.book.exemplary', 'book',
-        'Exemplaries')
+    author = fields.Many2One('library.author', 'Author', required=True,ondelete='CASCADE') 
+
+    exemplaries = fields.One2Many('library.book.exemplary', 'book','Exemplaries')
     title = fields.Char('Title', required=True)
     genre = fields.Many2One('library.genre', 'Genre', ondelete='RESTRICT',
         required=False)
