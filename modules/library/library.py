@@ -161,36 +161,38 @@ class Book(ModelSQL, ModelView):
     __name__ = 'library.book'
     _rec_name = 'title'
 
-    author = fields.Many2One('library.author', 'Author', required=True,
-        ondelete='CASCADE')
-    exemplaries = fields.One2Many('library.book.exemplary', 'book',
-        'Exemplaries')
+    author = fields.Many2One('library.author', 'Author', required=True,ondelete='CASCADE')
+
+    exemplaries = fields.One2Many('library.book.exemplary', 'book','Exemplaries')
+
     title = fields.Char('Title', required=True)
-    genre = fields.Many2One('library.genre', 'Genre', ondelete='RESTRICT',
-        domain=[('editors', '=', Eval('editor'))], depends=['editor'],
-        required=False)
+
+    genre = fields.Many2One('library.genre', 'Genre', ondelete='RESTRICT',domain=[('editors', '=', Eval('editor'))], depends=['editor'],required=False)
+
     editor = fields.Many2One('library.editor', 'Editor', ondelete='RESTRICT',
         domain=[If(
                 Bool(Eval('publishing_date', False)),
                 [('creation_date', '<=', Eval('publishing_date'))],
                 [])],
         required=True, depends=['publishing_date'])
-    isbn = fields.Char('ISBN', size=13,
-        help='The International Standard Book Number')
+    
+    isbn = fields.Char('ISBN', size=13,help='The International Standard Book Number')
+
     publishing_date = fields.Date('Publishing date')
+
     description = fields.Char('Description')
+
     summary = fields.Text('Summary')
+
     cover = fields.Binary('Cover')
-    page_count = fields.Integer('Page Count',
-        help='The number of page in the book')
-    edition_stopped = fields.Boolean('Edition stopped',
-        help='If True, this book will not be printed again in this version')
-    number_of_exemplaries = fields.Function(
-        fields.Integer('Number of exemplaries'),
-        'getter_number_of_exemplaries')
-    latest_exemplary = fields.Function(
-        fields.Many2One('library.book.exemplary', 'Latest exemplary'),
-        'getter_latest_exemplary')
+
+    page_count = fields.Integer('Page Count',help='The number of page in the book')
+
+    edition_stopped = fields.Boolean('Edition stopped',help='If True, this book will not be printed again in this version')
+
+    number_of_exemplaries = fields.Function(fields.Integer('Number of exemplaries'),'getter_number_of_exemplaries')
+
+    latest_exemplary = fields.Function(fields.Many2One('library.book.exemplary', 'Latest exemplary'),'getter_latest_exemplary')
 
     @classmethod
     def __setup__(cls):
@@ -200,12 +202,13 @@ class Book(ModelSQL, ModelView):
             ('author_title_uniq', Unique(t, t.author, t.title),
                 'The title must be unique per author!'),
             ]
+        
         cls._error_messages.update({
                 'invalid_isbn': 'ISBN should only be digits',
                 'bad_isbn_size': 'ISBN must have 13 digits',
                 'invalid_isbn_checksum': 'ISBN checksum invalid',
                 })
-
+    
     @classmethod
     def validate(cls, books):
         for book in books:
@@ -229,8 +232,7 @@ class Book(ModelSQL, ModelView):
         for exemplary in self.exemplaries:
             if not exemplary.acquisition_date:
                 continue
-            if not latest or(
-                    latest.acquisition_date < exemplary.acquisition_date):
+            if not latest or(latest.acquisition_date < exemplary.acquisition_date):
                 latest = exemplary
         return latest.id if latest else None
 
